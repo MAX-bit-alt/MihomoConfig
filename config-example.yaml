@@ -22,11 +22,15 @@ dns:
     'rule-set:private': [system]
     'rule-set:douyin': [180.184.1.1]
   nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
   proxy-server-nameserver:
-    - https://223.5.5.5/dns-query
-    - https://120.53.53.53/dns-query
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+
+hosts:
+  doh.pub: [1.12.12.12, 120.53.53.53]
+  dns.alidns.com: [223.5.5.5, 223.6.6.6]
 
 region_select_base: &region_select_base {type: select, proxies: [日本, 香港, 新加坡, 美国]}
 select_base: &select_base {type: select, include-all: true}
