@@ -26,20 +26,33 @@ dns:
 region_select_base: &region_select_base {type: select, proxies: [日本, 香港, 新加坡, 美国]}
 select_base: &select_base {type: select, include-all: true}
 
-filter_hk: &filter_hk filter: '(?i)香港|Hong\s*Kong|(?:^|[^A-Za-z])HKG?(?:[^A-Za-z]|$)|🇭🇰'
-filter_sg: &filter_sg filter: '(?i)新加坡|狮城|Singapore|(?:^|[^A-Za-z])SGP?(?:[^A-Za-z]|$)|🇸🇬'
-filter_jp: &filter_jp filter: '(?i)日本|Japan|(?:^|[^A-Za-z])JPN?(?:[^A-Za-z]|$)|🇯🇵'
-filter_us: &filter_us filter: '(?i)美国|United\s*States|(?:^|[^A-Za-z])USA?(?:[^A-Za-z]|$)|🇺🇸'
+filter_hk: &filter_hk
+  filter: '(?i)香港|Hong\s*Kong|(?:^|[^A-Za-z])HKG?(?:[^A-Za-z]|$)|🇭🇰'
+filter_sg: &filter_sg
+  filter: '(?i)新加坡|狮城|Singapore|(?:^|[^A-Za-z])SGP?(?:[^A-Za-z]|$)|🇸🇬'
+filter_jp: &filter_jp
+  filter: '(?i)日本|Japan|(?:^|[^A-Za-z])JPN?(?:[^A-Za-z]|$)|🇯🇵'
+filter_us: &filter_us
+  filter: '(?i)美国|United\s*States|(?:^|[^A-Za-z])USA?(?:[^A-Za-z]|$)|🇺🇸'
 
-icon_proxy: &icon_proxy icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png'
-icon_telegram: &icon_telegram icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png'
-icon_ai: &icon_ai icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png'
-icon_ehentai: &icon_ehentai icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/EHentai.svg'
-icon_google: &icon_google icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google_Search.png'
-icon_hk: &icon_hk icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png'
-icon_jp: &icon_jp icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png'
-icon_sg: &icon_sg icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png'
-icon_us: &icon_us icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png'
+icon_proxy: &icon_proxy
+  icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png'
+icon_telegram: &icon_telegram
+  icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png'
+icon_ai: &icon_ai
+  icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png'
+icon_ehentai: &icon_ehentai
+  icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/EHentai.svg'
+icon_google: &icon_google
+  icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google_Search.png'
+icon_hk: &icon_hk
+  icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png'
+icon_jp: &icon_jp
+  icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png'
+icon_sg: &icon_sg
+  icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png'
+icon_us: &icon_us
+  icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png'
 
 proxy-groups:
   - {name: 默认, <<: [*region_select_base, *icon_proxy]}
