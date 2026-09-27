@@ -55,16 +55,16 @@ icon_us: &icon_us
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png'
 
 proxy-groups:
-  - {name: 默认, <<: *region_select_base}
-  - {name: Telegram, <<: *region_select_base, default-selected: 香港}
-  - {name: 国外AI, <<: *region_select_base, default-selected: 美国}
-  - {name: E-Hentai, <<: *region_select_base, default-selected: 美国}
-  - {name: Google, <<: *region_select_base}
+  - {name: 默认, <<: [*region_select_base, *icon_proxy]}
+  - {name: Telegram, <<: [*region_select_base, *icon_telegram], default-selected: 香港}
+  - {name: 国外AI, <<: [*region_select_base, *icon_ai], default-selected: 美国}
+  - {name: E-Hentai, <<: [*region_select_base, *icon_ehentai], default-selected: 美国}
+  - {name: Google, <<: [*region_select_base, *icon_google]}
 
-  - {name: 香港, <<: [*select_base, *filter_hk]}
-  - {name: 新加坡, <<: [*select_base, *filter_sg]}
-  - {name: 日本, <<: [*select_base, *filter_jp]}
-  - {name: 美国, <<: [*select_base, *filter_us]}
+  - {name: 香港, <<: [*select_base, *filter_hk, *icon_hk]}
+  - {name: 新加坡, <<: [*select_base, *filter_sg, *icon_sg]}
+  - {name: 日本, <<: [*select_base, *filter_jp, *icon_jp]}
+  - {name: 美国, <<: [*select_base, *filter_us, *icon_us]}
 
 rules:
   - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_ip,no-resolve)))))),REJECT
