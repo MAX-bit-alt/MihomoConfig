@@ -9,6 +9,7 @@ profile: {store-fake-ip: true}
 tun:
   enable: true
   stack: mips
+  congestion-controller: bbr3
   dns-hijack: [any:53, tcp://any:53]
 
 dns:
@@ -30,6 +31,7 @@ dns:
 
 region_select_base: &region_select_base {type: select, proxies: [日本, 香港, 新加坡, 美国]}
 select_base: &select_base {type: select, include-all: true}
+reject_base: &reject_base {type: select, proxies: [REJECT-DROP, REJECT, PASS]}
 
 filter_hk: &filter_hk
   filter: '(?i)香港|Hong\s*Kong|(?:^|[^A-Za-z])HKG?(?:[^A-Za-z]|$)|🇭🇰'
@@ -43,6 +45,8 @@ filter_us: &filter_us
 icon_proxy: &icon_proxy
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png'
 icon_telegram: &icon_telegram
+icon_advertising: &icon_advertising
+  icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Advertising.png'
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png'
 icon_ai: &icon_ai
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png'
@@ -61,6 +65,7 @@ icon_us: &icon_us
 
 proxy-groups:
   - {name: 默认, <<: [*region_select_base, *icon_proxy]}
+  - {name: 广告, <<: [*reject_base, *icon_advertising]}
   - {name: Telegram, <<: [*region_select_base, *icon_telegram], default-selected: 香港}
   - {name: 国外AI, <<: [*region_select_base, *icon_ai], default-selected: 美国}
   - {name: E-Hentai, <<: [*region_select_base, *icon_ehentai], default-selected: 美国}
@@ -73,6 +78,7 @@ proxy-groups:
 
 rules:
   - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_ip,no-resolve)))))),REJECT
+  - RULE-SET,category-ads-all,广告
   - RULE-SET,private,DIRECT
   - RULE-SET,private_ip,DIRECT,no-resolve
   - RULE-SET,microsoft@cn,DIRECT
@@ -105,6 +111,9 @@ rule-providers:
   fakeip-filter:
     <<: *mrs_rules_domain
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/fakeip-filter.mrs'
+  category-ads-all:
+    <<: *mrs_rules_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-ads-all.mrs'
   private:
     <<: *mrs_rules_domain
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs'
