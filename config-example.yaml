@@ -44,7 +44,6 @@ filter_us: &filter_us
 
 icon_proxy: &icon_proxy
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png'
-icon_telegram: &icon_telegram
 icon_advertising: &icon_advertising
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Advertising.png'
 icon_telegram: &icon_telegram
