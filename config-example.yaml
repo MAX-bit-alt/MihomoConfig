@@ -1,4 +1,4 @@
-#本配置中删除了很多内核已有默认值 P.S.本人喜欢精简配置
+2#本配置中删除了很多内核已有默认值 P.S.本人喜欢精简配置
 #仅供参考，适合自己的才是最好的
 mixed-port: 7890
 unified-delay: true
@@ -47,6 +47,7 @@ icon_proxy: &icon_proxy
 icon_telegram: &icon_telegram
 icon_advertising: &icon_advertising
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Advertising.png'
+icon_telegram: &icon_telegram
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png'
 icon_ai: &icon_ai
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png'
