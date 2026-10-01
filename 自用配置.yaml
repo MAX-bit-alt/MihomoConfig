@@ -1,0 +1,171 @@
+mixed-port: 7890
+unified-delay: true
+tcp-concurrent: true
+external-controller: 127.0.0.1:9090
+profile: {store-fake-ip: true}
+
+tun:
+  enable: true
+  stack: mips
+  congestion-controller: bbr3
+  disable-icmp-forwarding: true
+  dns-hijack: [any:53, tcp://any:53]
+
+dns:
+  enable: true
+  enhanced-mode: fake-ip
+  fake-ip-filter:
+    - rule-set:private
+    - rule-set:fakeip-filter
+    - rule-set:geolocation-cn
+  nameserver-policy:
+    '*': [system]
+    'rule-set:private': [system]
+    'rule-set:douyin': [180.184.1.1, 180.184.2.2]
+  nameserver:
+    - 114.114.114.114
+    - tls://223.5.5.5
+    - https://doh.pub/dns-query
+  proxy-server-nameserver:
+    - 114.114.114.114
+    - tls://223.5.5.5
+    - https://doh.pub/dns-query
+# proxy-server-nameserver-policy:
+#    your_node_server_domain: your_airports_private_dns
+
+hosts:
+  doh.pub: [1.12.12.12, 120.53.53.53]
+
+proxies:
+  - {name: dual-stack, type: direct}
+  - {name: prefer-ipv4, type: direct, ip-version: ipv4-prefer}
+  - {name: prefer-ipv6, type: direct, ip-version: ipv6-prefer}
+  - {name: ipv4-only, type: direct, ip-version: ipv4}
+
+region_select_base: &region_select_base {type: select, proxies: [日本, 香港, 新加坡, 美国, 低倍率]}
+select_base: &select_base {type: select, include-all: true}
+reject_base: &reject_base {type: select, proxies: [REJECT-DROP, REJECT, 直连, 默认, PASS]}
+
+filter_hk: &filter_hk
+  filter: '(?i)香港|Hong\s*Kong|(?:^|[^A-Za-z])HKG?(?:[^A-Za-z]|$)|🇭🇰'
+filter_sg: &filter_sg
+  filter: '(?i)新加坡|狮城|Singapore|(?:^|[^A-Za-z])SGP?(?:[^A-Za-z]|$)|🇸🇬'
+filter_jp: &filter_jp
+  filter: '(?i)日本|Japan|(?:^|[^A-Za-z])JPN?(?:[^A-Za-z]|$)|🇯🇵'
+filter_us: &filter_us
+  filter: '(?i)美国|United\s*States|(?:^|[^A-Za-z])USA?(?:[^A-Za-z]|$)|🇺🇸'
+filter_low: &filter_low
+  filter: '(?i)(?<![\d.])0\s*\.\s*\d+(?!\s*[GM]B?)'
+
+proxy-groups:
+  - {name: 默认, <<: *region_select_base}
+  - {name: 广告, <<: *reject_base}
+  - {name: Telegram, <<: *region_select_base, default-selected: 香港}
+  - {name: 国外AI, <<: *region_select_base, default-selected: 美国}
+  - {name: YouTube, <<: *region_select_base, default-selected: 低倍率}
+  - {name: E-Hentai, <<: *region_select_base, default-selected: 美国}
+  - {name: 直连, type: select, proxies: [prefer-ipv4, prefer-ipv6, dual-stack, ipv4-only]}
+
+  - {name: 香港, <<: [*select_base, *filter_hk]}
+  - {name: 新加坡, <<: [*select_base, *filter_sg]}
+  - {name: 日本, <<: [*select_base, *filter_jp]}
+  - {name: 美国, <<: [*select_base, *filter_us]}
+  - {name: 低倍率, <<: [*select_base, *filter_low]}
+
+rules:
+  - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_ip,no-resolve)))))),REJECT
+  - RULE-SET,private,直连
+  - RULE-SET,private_ip,直连,no-resolve
+  - RULE-SET,category-ads-all,广告
+  - RULE-SET,microsoft@cn,直连
+  - RULE-SET,apple@cn,直连
+  - RULE-SET,geolocation-cn,直连
+  - RULE-SET,youtube,YouTube
+  - RULE-SET,google,默认
+  - RULE-SET,category-ai-!cn,国外AI
+  - RULE-SET,ehentai,E-Hentai
+  - RULE-SET,telegram,Telegram
+  - RULE-SET,geolocation-!cn,默认
+
+  - RULE-SET,telegram_ip,Telegram
+  - RULE-SET,google_ip,默认
+  - RULE-SET,cn_ip,直连
+  - MATCH,默认
+
+proxy_providers_base: &proxy_providers_base {type: http, interval: 86400, proxy: 直连, health-check: {enable: true, url: 'https://www.apple.com/library/test/success.html', interval: 600}}
+proxy-providers:
+  p1:
+    <<: *proxy_providers_base
+    url: ''
+    override:
+      additional-prefix: 'p1 | '
+  p2:
+    <<: *proxy_providers_base
+    url: ''
+    override:
+      additional-prefix: 'p2 | '
+  p3:
+    <<: *proxy_providers_base
+    url: ''
+    override:
+      additional-prefix: 'p3 | '
+  p4:
+    <<: *proxy_providers_base
+    url: ''
+    override:
+      additional-prefix: 'p4 | '
+
+mrs_rules_ipcidr: &mrs_rules_ipcidr {type: http, interval: 86400, behavior: ipcidr, format: mrs}
+mrs_rules_domain: &mrs_rules_domain {type: http, interval: 86400, behavior: domain, format: mrs}
+rule-providers:
+  fakeip-filter:
+    <<: *mrs_rules_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/fakeip-filter.mrs'
+  category-ads-all:
+    <<: *mrs_rules_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-ads-all.mrs'
+  private:
+    <<: *mrs_rules_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs'
+  douyin:
+    <<: *mrs_rules_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/douyin.mrs'
+  microsoft@cn:
+    <<: *mrs_rules_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft@cn.mrs'
+  apple@cn:
+    <<: *mrs_rules_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple@cn.mrs'
+  category-ai-!cn:
+    <<: *mrs_rules_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs'
+  telegram:
+    <<: *mrs_rules_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/telegram.mrs'
+  ehentai:
+    <<: *mrs_rules_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/ehentai.mrs'
+  youtube:
+    <<: *mrs_rules_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/youtube.mrs'
+  google:
+    <<: *mrs_rules_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs'
+  geolocation-cn:
+    <<: *mrs_rules_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs'
+  geolocation-!cn:
+    <<: *mrs_rules_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs'
+  private_ip:
+    <<: *mrs_rules_ipcidr
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs'
+  telegram_ip:
+    <<: *mrs_rules_ipcidr
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/telegram.mrs'
+  google_ip:
+    <<: *mrs_rules_ipcidr
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/google.mrs'
+  cn_ip:
+    <<: *mrs_rules_ipcidr
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs'
