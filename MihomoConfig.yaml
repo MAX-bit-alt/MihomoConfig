@@ -59,7 +59,7 @@ filter_low: &filter_low
 proxy-groups:
   - {name: 默认, <<: *region_select_base}
   - {name: 广告, <<: *reject_base}
-  - {name: Telegram, <<: *region_select_base, default-selected: 香港}
+  - {name: Telegram, <<: *region_select_base, default-selected: 新加坡}
   - {name: 国外AI, <<: *region_select_base, default-selected: 美国}
   - {name: YouTube, <<: *region_select_base, default-selected: 低倍率}
   - {name: E-Hentai, <<: *region_select_base, default-selected: 美国}
