@@ -41,6 +41,7 @@ proxies:
   - {name: prefer-ipv4, type: direct, ip-version: ipv4-prefer}
   - {name: prefer-ipv6, type: direct, ip-version: ipv6-prefer}
   - {name: ipv4-only, type: direct, ip-version: ipv4}
+  - {name: ipv6-only, type: direct, ip-version: ipv6}
 
 region_select_base: &region_select_base {type: select, proxies: [日本, 香港, 新加坡, 美国, 低倍率]}
 select_base: &select_base {type: select, include-all: true}
@@ -62,9 +63,8 @@ proxy-groups:
   - {name: 广告, <<: *reject_base}
   - {name: Telegram, <<: *region_select_base, default-selected: 新加坡}
   - {name: 国外AI, <<: *region_select_base, default-selected: 美国}
-  - {name: YouTube, <<: *region_select_base, default-selected: 低倍率}
   - {name: E-Hentai, <<: *region_select_base, default-selected: 美国}
-  - {name: 直连, type: select, proxies: [prefer-ipv4, prefer-ipv6, dual-stack, ipv4-only]}
+  - {name: 直连, type: select, proxies: [prefer-ipv4, prefer-ipv6, dual-stack, ipv4-only, ipv6-only]}
 
   - {name: 香港, <<: [*select_base, *filter_hk]}
   - {name: 新加坡, <<: [*select_base, *filter_sg]}
@@ -80,7 +80,6 @@ rules:
   - RULE-SET,microsoft@cn,直连
   - RULE-SET,apple@cn,直连
   - RULE-SET,geolocation-cn,直连
-  - RULE-SET,youtube,YouTube
   - RULE-SET,google,默认
   - RULE-SET,category-ai-!cn,国外AI
   - RULE-SET,ehentai,E-Hentai
@@ -145,9 +144,6 @@ rule-providers:
   ehentai:
     <<: *mrs_rules_domain
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/ehentai.mrs'
-  youtube:
-    <<: *mrs_rules_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/youtube.mrs'
   google:
     <<: *mrs_rules_domain
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs'
